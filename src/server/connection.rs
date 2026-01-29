@@ -2051,7 +2051,7 @@ impl Connection {
             }
 
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
-            self.try_start_cm_ipc();
+            // self.try_start_cm_ipc();
 
             #[cfg(not(target_os = "linux"))]
             let err_msg = "".to_owned();

@@ -1,0 +1,13 @@
+[package]
+name = "rustdesk_sdk"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+librustdesk = { package = "rustdesk", path = "../.." }
+hbb_common = { path = "../hbb_common" }
+libc = "0.2"
+serde_json = "1.0"

@@ -6226,6 +6226,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustdesk_sdk"
+version = "0.1.0"
+dependencies = [
+ "hbb_common",
+ "libc",
+ "rustdesk",
+ "serde_json 1.0.118",
+]
+
+[[package]]
 name = "rustfft"
 version = "6.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

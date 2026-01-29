@@ -1,0 +1,94 @@
+name: Build RustDesk SDK (Windows)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - ".github/**"
+      - "docs/**"
+      - "README.md"
+      - "res/**"
+      - "appimage/**"
+      - "flatpak/**"
+
+env:
+  RUST_VERSION: "1.75"
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  VCPKG_COMMIT_ID: "6f29f12e82a8293156836ad81cc9bf5af41fe836"
+  LLVM_VERSION: "15.0.6"
+
+jobs:
+  build-sdk-windows:
+    name: x86_64-pc-windows-msvc (SDK)
+    runs-on: windows-2022
+    steps:
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: ${{ env.LLVM_VERSION }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: x86_64-pc-windows-msvc
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          prefix-key: windows-sdk
+
+      - name: Setup vcpkg with Github Actions binary cache
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: C:\vcpkg
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotCache: false
+
+      - name: Install vcpkg dependencies
+        env:
+          VCPKG_DEFAULT_HOST_TRIPLET: x64-windows-static
+        shell: bash
+        run: |
+          if ! $VCPKG_ROOT/vcpkg \
+            install \
+            --triplet x64-windows-static \
+            --x-install-root="$VCPKG_ROOT/installed"; then
+            find "${VCPKG_ROOT}/" -name "*.log" | while read -r _1; do
+              echo "$_1:"
+              echo "======"
+              cat "$_1"
+              echo "======"
+              echo ""
+            done
+            exit 1
+          fi
+          head -n 100 "${VCPKG_ROOT}/buildtrees/ffmpeg/build-x64-windows-static-rel-out.log" || true
+
+      - name: Build RustDesk SDK (DLL)
+        shell: bash
+        run: |
+          cargo build -p rustdesk_sdk --release --target x86_64-pc-windows-msvc
+
+      - name: Upload SDK DLL
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustdesk-sdk-windows-x86_64
+          path: target/x86_64-pc-windows-msvc/release/rustdesk_sdk.dll
