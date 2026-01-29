@@ -9,9 +9,9 @@ RustDesk 上游仓库：
 https://github.com/rustdesk/rustdesk
 ```
 
-感谢 <a href="https://distromate.com">Distromate 分发助手</a> 提供支持
+感谢 <a href="https://www.distromate.net/">Distromate 分发助手</a> 提供支持
 
-<a href="https://distromate.com"><img alt="Distromate" src="https://obsidian-static.s3.bitiful.net/2026/01/%E9%A1%B5%E9%9D%A2%201.png" width="250" height=""></a>
+<a href="https://www.distromate.net/"><img alt="Distromate" src="https://obsidian-static.s3.bitiful.net/2026/01/%E9%A1%B5%E9%9D%A2%201.png" width="250" height=""></a>
 
 
 ## SDK 特性
